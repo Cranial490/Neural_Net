@@ -20,7 +20,7 @@ def sig_deriv(x):
 dataset = genfromtxt('seeds_binary.csv',delimiter=',')
 feat = dataset[:,0:6]
 trget = dataset[:,7,None]
-input_neurons = feat.shape[1] + 1 
+input_neurons = feat.shape[1] 
 hidden_layerN = 3 
 output_layerN = 1
 X = np.insert(feat,0,np.ones((1,feat.shape[0])),1)
@@ -39,44 +39,35 @@ y = np.array([[0],
 input_neurons = feat.shape[1] 
 hidden_layerN = 3 
 output_layerN = 1
-X = np.insert(feat,0,np.ones((1,feat.shape[0])),1)
+X = feat
 #----------------------------------------
 
 
 #Initialising weight matrices
 b12 = np.random.randn(1,hidden_layerN)
 b23 = np.random.randn(1,output_layerN)
-#print b12 , b23
-W12 = np.random.randn(input_neurons,hidden_layerN)
-W23 = np.random.randn(hidden_layerN,output_layerN)
-W12 = np.insert(W12,0,b12,0)
-W23 = np.insert(W23,0,b23,0)
-
-for i in range(1):
+W12= np.random.randn(input_neurons,hidden_layerN)
+W23= np.random.randn(hidden_layerN,output_layerN)
+neta = 0.1
+for i in range(60000):
     #Forward Pass
     h_in = np.dot(X,W12)
     h_out = sig_func(h_in)
-    h_out = np.insert(h_out,0,np.ones((1,h_out.shape[0])),1)
+    #h_out = np.insert(h_out,0,np.ones((1,h_out.shape[0])),1)
     o_in = np.dot(h_out,W23)
     o_out = sig_func(o_in)
     
     
     #Backward Pass
+    #for W23
     Err = y - o_out
-  
-    
-    
-    
-    
-    
-        
-    
-    
-    
-
-
-
-
-
-
-
+    dell23 = Err*sig_deriv(o_out)
+    delta23 = np.dot(h_out.T,dell23)
+    #for W12
+    dell12 = sig_deriv(h_out)
+    theta = np.dot(dell23,W23.T)*dell23
+    delta12 = np.dot(X.T,theta)
+    #updating the weights 
+    W12 = W12 + neta*delta12
+    W23 = W23 + neta*delta23
+print o_out
